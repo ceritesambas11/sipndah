@@ -1,164 +1,326 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Sistem Informasi Pendonor Darah</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jsPDF & autotable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <!-- SheetJS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIP NDAH UPD RSUD PEMANGKAT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-6">
-    <h1 class="text-2xl font-bold text-center mb-6">📌 SIP NDAH UPD RSUD PEMANGKAT </h1>
 
-    <!-- Form Input Data Pasien -->
-    <div class="mb-6">
-      <h2 class="text-lg font-semibold mb-2">Tambah Data Pasien</h2>
-      <form id="donorForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <input type="text" id="nama" placeholder="Nama" required class="border rounded p-2">
-        <input type="number" id="umur" placeholder="Umur" required class="border rounded p-2">
-        <select id="golongan" required class="border rounded p-2">
-          <option value="">Golongan Darah</option>
-          <option>A+</option><option>A-</option>
-          <option>B+</option><option>B-</option>
-          <option>O+</option><option>O-</option>
-          <option>AB+</option><option>AB-</option>
-        </select>
-        <input type="date" id="tanggal" required class="border rounded p-2">
-        <button type="submit" class="col-span-1 md:col-span-4 bg-red-500 text-white rounded p-2 hover:bg-red-600">Simpan</button>
-      </form>
-    </div>
+<div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-6 space-y-6">
 
-    <!-- Filter Nama & Golongan -->
-    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input type="text" id="searchInput" placeholder="🔍 Cari berdasarkan nama..." class="border rounded p-2">
-      <select id="filterGolongan" class="border rounded p-2">
-        <option value="">🔍 Semua Golongan</option>
-        <option>A+</option><option>A-</option>
-        <option>B+</option><option>B-</option>
-        <option>O+</option><option>O-</option>
-        <option>AB+</option><option>AB-</option>
-      </select>
-    </div>
+<!-- Header -->
+<div class="flex items-center gap-4 mb-6">
+<img src="upd.png" alt="Logo UPD" class="h-16">
+<h1 class="text-2xl font-bold text-center flex-1">SIP NDAH UPD RSUD PEMANGKAT</h1>
+</div>
 
-    <!-- Tombol Export -->
-    <div class="mb-4 flex gap-3">
-      <button id="exportPDF" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Export PDF</button>
-      <button id="exportExcel" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Export Excel</button>
-    </div>
+<!-- Menu Navigasi -->
+<div class="flex gap-2 mb-4">
+<button onclick="showTab('pendaftaran')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Pendaftaran Donor</button>
+<button onclick="showTab('tambahDonor')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Tambah Donor</button>
+<button onclick="showTab('riwayatDonor')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Riwayat Donor</button>
+</div>
 
-    <!-- Tabel Data Pasien -->
-    <div>
-      <h2 class="text-lg font-semibold mb-2">Riwayat Donor</h2>
-      <div class="overflow-x-auto">
-        <table id="dataTableWrapper" class="w-full border border-gray-300 text-sm">
-          <thead class="bg-gray-200">
-            <tr>
-              <th class="border px-2 py-1">Nama</th>
-              <th class="border px-2 py-1">Umur</th>
-              <th class="border px-2 py-1">Gol. Darah</th>
-              <th class="border px-2 py-1">Jumlah Donor</th>
-              <th class="border px-2 py-1">Riwayat</th>
-            </tr>
-          </thead>
-          <tbody id="dataTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<!-- Halaman Pendaftaran Pasien -->
+<div id="pendaftaran" class="tab-content">
+<h2 class="text-lg font-semibold mb-2">Pendaftaran Donor</h2>
+<form id="pendaftaranForm" class="grid grid-cols-1 md:grid-cols-6 gap-2 mb-4">
+<input type="text" id="p_nama" placeholder="Nama" required class="border rounded p-2">
+<input type="text" id="p_nik" placeholder="NIK" required class="border rounded p-2">
+<select id="p_jenisKelamin" required class="border rounded p-2">
+<option value="">Jenis Kelamin</option>
+<option value="L">L</option>
+<option value="P">P</option>
+</select>
+<input type="date" id="p_tglLahir" required class="border rounded p-2">
+<input type="text" id="p_alamat" placeholder="Alamat" required class="border rounded p-2">
+<select id="p_golongan" required class="border rounded p-2">
+<option value="">Golongan Darah</option>
+<option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+<option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+</select>
+<button type="submit" class="col-span-1 md:col-span-6 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Daftar</button>
+</form>
 
-  <script>
-    const donorForm = document.getElementById("donorForm");
-    const dataTable = document.getElementById("dataTable");
-    const searchInput = document.getElementById("searchInput");
-    const filterGolongan = document.getElementById("filterGolongan");
+<div class="overflow-x-auto">
+<table class="w-full border border-gray-300 text-sm">
+<thead class="bg-gray-200">
+<tr>
+<th class="border px-2 py-1">Nama</th>
+<th class="border px-2 py-1">NIK</th>
+<th class="border px-2 py-1">Jenis Kelamin</th>
+<th class="border px-2 py-1">Tanggal Lahir</th>
+<th class="border px-2 py-1">Alamat</th>
+<th class="border px-2 py-1">Golongan</th>
+<th class="border px-2 py-1">Aksi</th>
+</tr>
+</thead>
+<tbody id="tabelPasien"></tbody>
+</table>
+</div>
 
-    const exportPDFBtn = document.getElementById("exportPDF");
-    const exportExcelBtn = document.getElementById("exportExcel");
+<div class="flex gap-2 mt-2">
+<button id="exportPasienExcel" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">Export Excel</button>
+<button id="exportPasienPDF" class="bg-purple-500 text-white p-2 rounded hover:bg-purple-600">Export PDF</button>
+</div>
+</div>
 
-    let pasienList = JSON.parse(localStorage.getItem("pasienList")) || [];
+<!-- Halaman Tambah Donor -->
+<div id="tambahDonor" class="tab-content hidden">
+<h2 class="text-lg font-semibold mb-2">Tambah Donor</h2>
+<form id="donorForm" class="grid grid-cols-1 md:grid-cols-6 gap-2 mb-4">
+<select id="d_nama" class="border rounded p-2" required>
+<option value="">Pilih atau ketik nama pasien</option>
+</select>
+<input type="number" id="d_umur" placeholder="Umur" class="border rounded p-2" required readonly>
+<select id="d_jenisKelamin" class="border rounded p-2" required disabled>
+<option value="">Jenis Kelamin</option>
+<option value="L">L</option>
+<option value="P">P</option>
+</select>
+<select id="d_golongan" class="border rounded p-2" required disabled>
+<option value="">Golongan Darah</option>
+<option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+<option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+</select>
+<input type="date" id="d_tanggal" required class="border rounded p-2">
+<button type="submit" class="col-span-1 md:col-span-6 bg-red-500 text-white p-2 rounded hover:bg-red-600">Simpan Donor</button>
+</form>
+</div>
 
-    // Render data ke tabel dengan filter
-    function renderTable(filterNama = "", filterGol = "") {
-      dataTable.innerHTML = "";
-      pasienList
-        .filter(p =>
-          p.nama.toLowerCase().includes(filterNama.toLowerCase()) &&
-          (filterGol === "" || p.golongan === filterGol)
-        )
-        .forEach((p) => {
-          let row = `<tr>
-            <td class='border px-2 py-1'>${p.nama}</td>
-            <td class='border px-2 py-1 text-center'>${p.umur}</td>
-            <td class='border px-2 py-1 text-center'>${p.golongan}</td>
-            <td class='border px-2 py-1 text-center'>${p.riwayat.length}</td>
-            <td class='border px-2 py-1'>${p.riwayat.join(", ")}</td>
-          </tr>`;
-          dataTable.innerHTML += row;
-        });
-    }
+<!-- Halaman Riwayat Donor -->
+<div id="riwayatDonor" class="tab-content hidden">
+<h2 class="text-lg font-semibold mb-2">Riwayat Donor</h2>
 
-    // Simpan data
-    donorForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nama = document.getElementById("nama").value.trim();
-      const umur = document.getElementById("umur").value;
-      const golongan = document.getElementById("golongan").value;
-      const tanggal = document.getElementById("tanggal").value;
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+<input type="text" id="searchInput" placeholder="🔍 Cari berdasarkan nama..." class="border rounded p-2">
+<select id="filterGolongan" class="border rounded p-2">
+<option value="">🔍 Semua Golongan</option>
+<option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+<option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+</select>
+</div>
 
-      let pasien = pasienList.find(p => p.nama.toLowerCase() === nama.toLowerCase() && p.umur == umur && p.golongan === golongan);
-      if (pasien) {
-        pasien.riwayat.push(tanggal);
-      } else {
-        pasienList.push({ nama, umur, golongan, riwayat: [tanggal] });
-      }
+<div class="overflow-x-auto">
+<table class="w-full border border-gray-300 text-sm">
+<thead class="bg-gray-200">
+<tr>
+<th class="border px-2 py-1">Nama</th>
+<th class="border px-2 py-1">Umur</th>
+<th class="border px-2 py-1">Jenis Kelamin</th>
+<th class="border px-2 py-1">Golongan</th>
+<th class="border px-2 py-1">Jumlah Donor</th>
+<th class="border px-2 py-1">Tanggal Donor</th>
+<th class="border px-2 py-1">Tanggal Kembali</th>
+<th class="border px-2 py-1">Aksi</th>
+</tr>
+</thead>
+<tbody id="tabelRiwayat"></tbody>
+</table>
+</div>
 
-      localStorage.setItem("pasienList", JSON.stringify(pasienList));
-      donorForm.reset();
-      renderTable(searchInput.value, filterGolongan.value);
-    });
+<div class="flex gap-2 mt-2">
+<button id="exportRiwayatExcel" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">Export Excel</button>
+<button id="exportRiwayatPDF" class="bg-purple-500 text-white p-2 rounded hover:bg-purple-600">Export PDF</button>
+</div>
+</div>
 
-    // Filter saat mengetik nama atau pilih golongan
-    searchInput.addEventListener("input", () => {
-      renderTable(searchInput.value, filterGolongan.value);
-    });
+<script>
+// ========== DATA ==========
+let pasienList = JSON.parse(localStorage.getItem("pasienList")) || [];
 
-    filterGolongan.addEventListener("change", () => {
-      renderTable(searchInput.value, filterGolongan.value);
-    });
+// ========== NAV TAB ==========
+function showTab(tabId){
+document.querySelectorAll('.tab-content').forEach(div=>div.classList.add('hidden'));
+document.getElementById(tabId).classList.remove('hidden');
+}
 
-    // Export ke PDF
-    exportPDFBtn.addEventListener("click", () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Laporan Riwayat Donor Darah", 14, 15);
-      doc.autoTable({
-        html: "#dataTableWrapper",
-        startY: 20,
-        styles: { fontSize: 8 }
-      });
-      doc.save("riwayat_donor.pdf");
-    });
+// ========== RENDER TABEL PASIEN ==========
+function renderTabelPasien(){
+const tabel=document.getElementById("tabelPasien");
+tabel.innerHTML="";
+pasienList.forEach((p,i)=>{
+tabel.innerHTML+=`<tr>
+<td class="border px-2 py-1">${p.nama}</td>
+<td class="border px-2 py-1">${p.nik}</td>
+<td class="border px-2 py-1 text-center">${p.jenisKelamin}</td>
+<td class="border px-2 py-1 text-center">${p.tglLahir}</td>
+<td class="border px-2 py-1">${p.alamat}</td>
+<td class="border px-2 py-1 text-center">${p.golongan}</td>
+<td class="border px-2 py-1 text-center">
+<button onclick="editPasien(${i})" class="px-2 py-1 bg-yellow-400 text-white rounded text-xs">Edit</button>
+<button onclick="deletePasien(${i})" class="px-2 py-1 bg-red-500 text-white rounded text-xs">Hapus</button>
+</td>
+</tr>`;
+});
+renderDropdown();
+renderRiwayat();
+}
 
-    // Export ke Excel
-    exportExcelBtn.addEventListener("click", () => {
-      const wb = XLSX.utils.book_new();
-      const ws_data = [
-        ["Nama", "Umur", "Golongan Darah", "Jumlah Donor", "Riwayat"]
-      ];
-      pasienList.forEach(p => {
-        ws_data.push([p.nama, p.umur, p.golongan, p.riwayat.length, p.riwayat.join(", ")]);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      XLSX.utils.book_append_sheet(wb, ws, "Riwayat Donor");
-      XLSX.writeFile(wb, "riwayat_donor.xlsx");
-    });
+// ========== DROPDOWN PASIEN ==========
+function renderDropdown(){
+const dNama=document.getElementById("d_nama");
+dNama.innerHTML='<option value="">Pilih atau ketik nama pasien</option>';
+pasienList.forEach(p=>{
+dNama.innerHTML+=`<option value="${p.nama}">${p.nama}</option>`;
+});
+}
 
-    renderTable();
-  </script>
+// ========== RENDER RIWAYAT DONOR ==========
+function renderRiwayat(filterNama="",filterGol=""){
+const tabel=document.getElementById("tabelRiwayat");
+tabel.innerHTML="";
+pasienList.filter(p=>p.nama.toLowerCase().includes(filterNama.toLowerCase())&&(filterGol===""||p.golongan===filterGol))
+.forEach((p,i)=>{
+p.riwayat.forEach((tgl,j)=>{
+const donorDate=new Date(tgl);
+let kembaliDate=new Date(donorDate);
+kembaliDate.setDate(kembaliDate.getDate() + (p.jenisKelamin==="L"?60:90));
+tabel.innerHTML+=`<tr>
+<td class="border px-2 py-1">${p.nama}</td>
+<td class="border px-2 py-1 text-center">${new Date().getFullYear()-new Date(p.tglLahir).getFullYear()}</td>
+<td class="border px-2 py-1 text-center">${p.jenisKelamin}</td>
+<td class="border px-2 py-1 text-center">${p.golongan}</td>
+<td class="border px-2 py-1 text-center">${p.riwayat.length}</td>
+<td class="border px-2 py-1 text-center">${tgl}</td>
+<td class="border px-2 py-1 text-center">${kembaliDate.toISOString().slice(0,10)}</td>
+<td class="border px-2 py-1 text-center">
+<button onclick="editRiwayat(${i},${j})" class="px-2 py-1 bg-yellow-400 text-white rounded text-xs">Edit</button>
+<button onclick="deleteRiwayat(${i},${j})" class="px-2 py-1 bg-red-500 text-white rounded text-xs">Hapus</button>
+</td>
+</tr>`;
+});
+});
+}
+
+// ======= EVENT PENDAFTARAN =======
+document.getElementById("pendaftaranForm").addEventListener("submit",e=>{
+e.preventDefault();
+const nama=document.getElementById("p_nama").value.trim();
+const nik=document.getElementById("p_nik").value.trim();
+const jenisKelamin=document.getElementById("p_jenisKelamin").value;
+const tglLahir=document.getElementById("p_tglLahir").value;
+const alamat=document.getElementById("p_alamat").value.trim();
+const golongan=document.getElementById("p_golongan").value;
+
+if(!pasienList.find(p=>p.nik===nik)){
+pasienList.push({nama,nik,jenisKelamin,tglLahir,alamat,golongan,riwayat:[]});
+localStorage.setItem("pasienList",JSON.stringify(pasienList));
+document.getElementById("pendaftaranForm").reset();
+renderTabelPasien();
+alert("Pasien berhasil didaftarkan!");
+}else{alert("NIK sudah terdaftar!");}
+});
+
+// ======= EVENT TAMBAH DONOR =======
+document.getElementById("donorForm").addEventListener("submit",e=>{
+e.preventDefault();
+const nama=document.getElementById("d_nama").value;
+const tanggal=document.getElementById("d_tanggal").value;
+let pasien=pasienList.find(p=>p.nama===nama);
+if(pasien){
+pasien.riwayat.push(tanggal);
+localStorage.setItem("pasienList",JSON.stringify(pasienList));
+document.getElementById("donorForm").reset();
+document.getElementById("d_umur").value="";
+document.getElementById("d_jenisKelamin").value="";
+document.getElementById("d_golongan").value="";
+renderRiwayat();
+}else{alert("Pilih pasien yang sudah terdaftar!");}
+});
+
+// ======= AUTOFILL DONOR =======
+document.getElementById("d_nama").addEventListener("change",()=>{
+const nama=document.getElementById("d_nama").value;
+let pasien=pasienList.find(p=>p.nama===nama);
+if(pasien){
+document.getElementById("d_umur").value=new Date().getFullYear()-new Date(pasien.tglLahir).getFullYear();
+document.getElementById("d_jenisKelamin").value=pasien.jenisKelamin;
+document.getElementById("d_golongan").value=pasien.golongan;
+}
+document.getElementById("d_tanggal").value=new Date().toISOString().slice(0,10);
+});
+
+// ======= FILTER RIWAYAT =======
+document.getElementById("searchInput").addEventListener("input",()=>renderRiwayat(document.getElementById("searchInput").value,document.getElementById("filterGolongan").value));
+document.getElementById("filterGolongan").addEventListener("change",()=>renderRiwayat(document.getElementById("searchInput").value,document.getElementById("filterGolongan").value));
+
+// ======= EDIT/HAPUS PASIEN & RIWAYAT =======
+function editPasien(i){
+let p=pasienList[i];
+p.nama=prompt("Nama:",p.nama)||p.nama;
+p.jenisKelamin=prompt("Jenis Kelamin (L/P):",p.jenisKelamin)||p.jenisKelamin;
+p.tglLahir=prompt("Tanggal Lahir:",p.tglLahir)||p.tglLahir;
+p.alamat=prompt("Alamat:",p.alamat)||p.alamat;
+p.golongan=prompt("Golongan Darah:",p.golongan)||p.golongan;
+localStorage.setItem("pasienList",JSON.stringify(pasienList));
+renderTabelPasien();
+}
+
+function deletePasien(i){
+if(confirm("Hapus pasien beserta riwayat donor?")){
+pasienList.splice(i,1);
+localStorage.setItem("pasienList",JSON.stringify(pasienList));
+renderTabelPasien();
+}
+}
+
+function editRiwayat(pIndex,rIndex){
+let newTanggal=prompt("Ubah tanggal donor:",pasienList[pIndex].riwayat[rIndex]);
+if(newTanggal){pasienList[pIndex].riwayat[rIndex]=newTanggal;localStorage.setItem("pasienList",JSON.stringify(pasienList));renderRiwayat();}
+}
+
+function deleteRiwayat(pIndex,rIndex){
+if(confirm("Hapus tanggal donor ini?")){pasienList[pIndex].riwayat.splice(rIndex,1);localStorage.setItem("pasienList",JSON.stringify(pasienList));renderRiwayat();}
+}
+
+// ======= EXPORT EXCEL & PDF =======
+document.getElementById("exportPasienExcel").addEventListener("click",()=>{
+let wb=XLSX.utils.book_new();
+let ws_data=[["Nama","NIK","Jenis Kelamin","Tanggal Lahir","Alamat","Golongan"]];
+pasienList.forEach(p=>{ws_data.push([p.nama,p.nik,p.jenisKelamin,p.tglLahir,p.alamat,p.golongan]);});
+let ws=XLSX.utils.aoa_to_sheet(ws_data);
+XLSX.utils.book_append_sheet(wb,ws,"Pasien");
+XLSX.writeFile(wb,"Pasien.xlsx");
+});
+
+document.getElementById("exportPasienPDF").addEventListener("click",()=>{
+const { jsPDF } = window.jspdf; const doc=new jsPDF(); doc.text("Daftar Pasien",10,10); let y=20;
+pasienList.forEach(p=>{doc.text(`${p.nama} | ${p.nik} | ${p.jenisKelamin} | ${p.tglLahir} | ${p.alamat} | ${p.golongan}`,10,y); y+=10;});
+doc.save("Pasien.pdf");
+});
+
+document.getElementById("exportRiwayatExcel").addEventListener("click",()=>{
+let wb=XLSX.utils.book_new();
+let ws_data=[["Nama","Umur","Jenis Kelamin","Golongan","Jumlah Donor","Tanggal Donor","Tanggal Kembali"]];
+pasienList.forEach(p=>{
+p.riwayat.forEach(tgl=>{
+const donorDate=new Date(tgl); let kembaliDate=new Date(donorDate); kembaliDate.setDate(kembaliDate.getDate()+(p.jenisKelamin==="L"?60:90));
+ws_data.push([p.nama,new Date().getFullYear()-new Date(p.tglLahir).getFullYear(),p.jenisKelamin,p.golongan,p.riwayat.length,tgl,kembaliDate.toISOString().slice(0,10)]);
+});
+});
+let ws=XLSX.utils.aoa_to_sheet(ws_data);
+XLSX.utils.book_append_sheet(wb,ws,"Riwayat Donor");
+XLSX.writeFile(wb,"RiwayatDonor.xlsx");
+});
+
+document.getElementById("exportRiwayatPDF").addEventListener("click",()=>{
+const { jsPDF } = window.jspdf; const doc=new jsPDF(); doc.text("Riwayat Donor Darah",10,10); let y=20;
+pasienList.forEach(p=>{p.riwayat.forEach(tgl=>{
+const donorDate=new Date(tgl); let kembaliDate=new Date(donorDate); kembaliDate.setDate(kembaliDate.getDate()+(p.jenisKelamin==="L"?60:90));
+doc.text(`${p.nama} | ${new Date().getFullYear()-new Date(p.tglLahir).getFullYear()} | ${p.jenisKelamin} | ${p.golongan} | ${p.riwayat.length} | ${tgl} | ${kembaliDate.toISOString().slice(0,10)}`,10,y); y+=10;
+});});
+doc.save("RiwayatDonor.pdf");
+});
+
+// Inisialisasi
+renderTabelPasien();
+showTab('pendaftaran');
+</script>
+
 </body>
 </html>
